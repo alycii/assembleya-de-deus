@@ -4,8 +4,6 @@
 org 0x7c00 
 jmp 0x0000:start
 
-hello db 'Hello, World!', 13, 10, 0
-
 start:
 	xor ax, ax
 	mov ds, ax
@@ -13,34 +11,35 @@ start:
 	mov ah, 0
 	mov al, 12h
 	
-	mov ah, 0xb
-	mov bh, 0
-	mov bl, 47
-	int 10h
-	
-	mov AX, 0013h
+	mov AX, 0011h
+    mov bh, 0
+	mov bl, 5
 	int 10h
 
-	call leitura
+    push 1
+	jmp leitura
 
 leitura:
 	mov ah, 0
 	int 16h
-	cmp al, 13
-	je fim
-	
-	call escreve
+    push AX
+    cmp al, 13
+    je escreveInvertido
 
+	jmp escreve
 escreve:
 	mov ah, 0xe
 	int 10h
-	call leitura
-	
+	jmp leitura
+escreveInvertido:
+    pop AX
+    cmp al, 1
+    je fim
+
+    mov ah, 0xe
+    int 10h
+    jmp escreveInvertido
 fim:
-	mov ah, 0xe
-	mov bh, 0
-	mov bl, 4
-	int 10h
 	jmp $
 	
 times 510 - ($ - $$) db 0
