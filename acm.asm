@@ -1,4 +1,4 @@
-;nasm -f bin acm.asm -o acm.bin
+;nasm -f bin acm.asm -o acm.bin // nasm -f bin acm.asm -o acm.o
 ;qemu-system-i386 -drive file=acm.bin,format=raw,index=0,media=disk
 
 org 0x7c00 
@@ -11,7 +11,7 @@ start:
 	mov ah, 0
 	mov al, 12h
 	
-	mov AX, 0011h
+	mov AX, 0013h
     mov bh, 0
 	mov bl, 5
 	int 10h
