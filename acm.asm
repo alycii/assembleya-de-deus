@@ -5,11 +5,8 @@ org 0x7c00
 jmp 0x0000:start
 
 start:
-	xor ax, ax
-	mov ds, ax
-	
-	mov ah, 0
-	mov al, 12h
+	xor ax, ax	;zera ax
+	mov ds, ax	;zera ds
 	
 	mov AX, 0013h
     mov bh, 0
@@ -27,10 +24,12 @@ leitura:
     je escreveInvertido
 
 	jmp escreve
+
 escreve:
 	mov ah, 0xe
 	int 10h
 	jmp leitura
+
 escreveInvertido:
     pop AX
     cmp al, 1
@@ -39,6 +38,7 @@ escreveInvertido:
     mov ah, 0xe
     int 10h
     jmp escreveInvertido
+	
 fim:
 	jmp $
 	
