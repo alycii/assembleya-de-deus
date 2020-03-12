@@ -1,8 +1,15 @@
 org 0x7c00
 jmp 0x0000:start 
 data:
-    ent db 20, 0
-    endl db ' ',13,10,0 ;printar um \n
+    enta db 20, 0, 0
+    nTem db "NAO EXISTEz", 13, 10, 0
+    verd db 'VERDEz', 13, 10, 0
+    amar db "AMARELOz", 13, 10, 0
+    azul db "AZULz", 13, 10, 0
+    verm db "VERMELHOz", 13, 10, 0
+    
+    endl db ' ', 13, 10, 0 ;printar um \n
+
 lerChar:
     mov ah, 0x00
     int 16h
@@ -35,16 +42,44 @@ contar:
     .endloop:
         ret
 comparaString:
-    add si, 4
+    add si, 3
     lodsb
 
     cmp al, 'l'
-    mov bl, 1
-    jmp printaString2
+    je .azul
 
-    cmp al, 'l'
-    mov bl, 14
-    je printaString2
+    cmp al, 'r'
+    je .amarelo
+
+    cmp al, 'd'
+    je .verde
+
+    cmp al, 'm'
+    je .vermelho
+
+    .nada:
+        mov si, nTem
+        mov bl, 5
+        jmp printaString2
+    .azul:
+        mov si, azul
+        mov bl, 1
+        jmp printaString2
+
+    .amarelo:
+        mov si, amar
+        mov bl, 14
+        jmp printaString2
+
+    .verde:
+        mov si, verd
+        mov bl, 2
+        jmp printaString2
+    
+    .vermelho:
+        mov si, verm
+        mov bl, 4
+        jmp printaString2
 
     ret
 ; FUNCIONA NAO MEXER
@@ -54,7 +89,7 @@ printaString:
     mov dh, 0
     mov dl, 0
     int 10h
-    mov si, ent
+    mov si, enta
     .loop:
         lodsb
         cmp al, 0 ;chegou no fim da string?
@@ -65,21 +100,22 @@ printaString:
         ret    
 ; FUNCIONA??????? TALVEZ
 printaString2:
-    mov si, ent
     mov ah, 02h
     mov bh, 0
     mov dh, 0
     mov dl, 0
     int 10h
     .loop:
-        mov ah, 09h
         lodsb
+        cmp al, 'z';chegou no fim da string?
+        je fim
+
+        mov ah, 09h
+        mov al, al
         mov bh, 0
         mov bl, bl
         mov cx, 1
         int 10h
-        cmp al, 0 ;chegou no fim da string?
-        je fim
         call printChar
         mov ah, 02h
         mov bh, 0
@@ -96,12 +132,12 @@ start:
 	mov bl, 47
 	int 10h
 
-    mov di, ent ;di aponta pro começo da string p/ usar
+    mov di, enta ;di aponta pro começo da string p/ usar
     call lerString
-    mov si, ent  ;si aposta pro começo da string
+    mov si, enta ;si aposta pro começo da string
     call contar
-    mov si, ent
-    call comparaString
+    mov si, enta
+    call comparaAzul
 fim:
     jmp $
 times 510 - ($ - $$) db 0
