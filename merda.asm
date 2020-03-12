@@ -42,91 +42,152 @@ contar:
         jmp .loop
     .endloop:
         ret
-comparaString:
-    add si, 3
+comparaVermelho:
     lodsb
-
-    cmp al, 'l'
-    je .azul
-
+    cmp al, 'v'
+    jne .errou
+    lodsb
+    cmp al, 'e'
+    jne .errou
+    lodsb
     cmp al, 'r'
-    je .amarelo
-
-    cmp al, 'd'
-    je .verde
-
+    jne .errou
+    lodsb
     cmp al, 'm'
+    jne .errou
+    lodsb
+    cmp al, 'e'
+    jne .errou
+    lodsb
+    cmp al, 'l'
+    jne .errou
+    lodsb
+    cmp al, 'h'
+    jne .errou
+    lodsb
+    cmp al, 'o'
+    jne .errou
+    lodsb
+    cmp al, 0
     je .vermelho
 
-    .nada:
-        mov si, nTem
-        mov bl, 5
-        jmp printaString2
-    .azul:
-        mov si, azul
-        mov bl, 1
-        jmp printaString2
-
-    .amarelo:
-        mov si, amar
-        mov bl, 14
-        jmp printaString2
-
-    .verde:
-        mov si, verd
-        mov bl, 2
-        jmp printaString2
-    
+    .errou:
+        ret
     .vermelho:
         mov si, verm
         mov bl, 4
         jmp printaString2
 
     ret
-comparaAzul:
-    mov si, enta
+comparaAmarelo:
+    lodsb
     cmp al, 'a'
     jne .errou
-    ;add si, 1
-    ;cmp al, 'z'
-    ;jne .errou
-    ;add si, 1
-    ;cmp al, 'u'
-    ;jne .errou
-    ;add si, 1
-    ;cmp al, 'l'
-    ;jne .errou
+    lodsb
+    cmp al, 'm'
+    jne .errou
+    lodsb
+    cmp al, 'a'
+    jne .errou
+    lodsb
+    cmp al, 'r'
+    jne .errou
+    lodsb
+    cmp al, 'e'
+    jne .errou
+    lodsb
+    cmp al, 'l'
+    jne .errou
+    lodsb
+    cmp al, 'o'
+    jne .errou
+    lodsb
+    cmp al, 0
+    je .amarelo
 
+    .errou:
+        ret
+    .amarelo:
+        mov si, amar
+        mov bl, 14
+        jmp printaString2
+comparaAzul:
+    lodsb
+    cmp al, 'a'
+    jne .errou
+    lodsb
+    cmp al, 'z'
+    jne .errou
+    lodsb
+    cmp al, 'u'
+    jne .errou
+    lodsb
+    cmp al, 'l'
+    jne .errou
+    lodsb
+    cmp al, 0
+    je .azul
+
+    .errou:
+        ret
     .azul:
         mov si, azul
         mov bl, 1
         jmp printaString2 
+comparaVerde:
+    lodsb
+    cmp al, 'v'
+    jne .errou
+    lodsb
+    cmp al, 'e'
+    jne .errou
+    lodsb
+    cmp al, 'r'
+    jne .errou
+    lodsb
+    cmp al, 'd'
+    jne .errou
+    lodsb
+    cmp al, 'e'
+    jne .errou
+    lodsb
+    cmp al, 0
+    je .verde
 
     .errou:
         ret
+    .verde:
+        mov si, verd
+        mov bl, 2
+        jmp printaString2
+
 printaString2:
-    mov ah, 02h
+    mov ah, 02h ;move o cursor pro inicio
     mov bh, 0
     mov dh, 0
     mov dl, 0
     int 10h
+
     .loop:
         lodsb
-        cmp al, 'z';chegou no fim da string?
+        cmp al, 'z' ;chegou no fim da string?
         je fim
 
-        mov ah, 09h
-        mov al, al
-        mov bh, 0
-        mov bl, bl
-        mov cx, 1
+        mov ah, 09h ;configurar(?) o caractere colorido
+        mov al, al  ;al = letra
+        mov bh, 0   ;bh = pagina???
+        mov bl, bl  ;bl = cor
+        mov cx, 1   ;cx = qnts caracteres ce vai imprimir
         int 10h
+
         call printChar
-        mov ah, 02h
+
+        mov ah, 02h ;move o cursor pra proxima posicao
         mov bh, 0
         mov dh, 0
         add dl, 1
         int 10h
+
         jmp .loop
 start:
     xor ax, ax	;zera ax
@@ -143,6 +204,18 @@ start:
     call contar
     mov si, enta
     call comparaAzul
+    mov si, enta
+    call comparaVerde
+    mov si, enta
+    call comparaVermelho
+    mov si, enta
+    call comparaAmarelo
+    jmp naoExiste
+
+naoExiste: 
+    mov si, nTem
+    mov bl, 5
+    jmp printaString2
 fim:
     jmp $
 times 510 - ($ - $$) db 0
