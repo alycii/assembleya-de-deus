@@ -2,6 +2,7 @@ org 0x7c00
 jmp 0x0000:start 
 data:
     enta db 20, 0, 0
+    lixo db "k", 10, 10, 0
     nTem db "NAO EXISTEz", 13, 10, 0
     verd db 'VERDEz', 13, 10, 0
     amar db "AMARELOz", 13, 10, 0
@@ -137,7 +138,7 @@ start:
     mov si, enta ;si aposta pro começo da string
     call contar
     mov si, enta
-    call comparaAzul
+    call comparaString
 fim:
     jmp $
 times 510 - ($ - $$) db 0
