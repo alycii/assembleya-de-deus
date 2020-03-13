@@ -2,7 +2,7 @@ org 0x7c00
 jmp 0x0000:start
 
 data:
-    ans db 0
+    ans db "a", 10, 10, 0
     ct db 0
     qt db 0
 start:
@@ -52,7 +52,7 @@ lerCt:                      ;fazer o loop dos casos testes e pular a linha
 
         jmp .loop
     .endloop:
-        jmp fim
+        jmp printaAns
 lerEnt:
     .loop:
         mov ah, 0       ;leio mais um caracter
@@ -74,62 +74,36 @@ lerEnt:
         int 10h
         jmp lerCt
 empilhaP:
-    push ax
+    push ax             ;coloca o parenteses abrindo na pilha
     jmp lerEnt
 desempilhaP:
     pop ax
-    
-    cmp al, 1
-    je salvaNao
 
-    cmp al, '('
-    jne salvaNao
+    cmp al, 1           ;se o topo da pilha eh 1 entao quer dizer que eu nao tenho 
+    je salvaNao         ;o parentese abrindo portanto está desbalanceado
+
+    cmp al, '('         ;se eu tiver outro caracter
+    jne salvaNao        ;também está errado
 
     jmp lerEnt
-salvaNao:
-    mov al, 'N'
+salvaNao:               ;a ideia era salvar cada resposta no seu indice
+    mov al, 'N'         ;mas nao ta funfando
     mov si, ans
     add si, [qt]
     stosb
     jmp desempilhaP
-comparaChar:
-    cmp al, '('
-    je .empilha
-    cmp al, '['
-    je .empilha
-    cmp al, '{'
-    je .empilha
+printaAns:              ;fiz pra debugar o salvaNao
+    mov si, ans
+    lodsb
 
-    cmp al, ')'
-    je .confere1
-    cmp al, ']'
-    je .confere2
-    cmp al, '}'
-    je .confere3
+    mov ah, 02h         ;colocando o cursor na próxima linha
+    mov bh, 0
+    add dh, 1
+    mov dl, 0
+    int 10h
 
-    .ignora:
-        ret
-    .confere1:
-        pop ax
-        cmp al, '('
-        je lerEnt
-        jmp .errado
-    .confere2:
-        pop ax
-        cmp al, '['
-        jne .errado
-        ret
-    .confere3:
-        pop ax
-        cmp al, '{'
-        jne .errado
-        ret
-    .empilha:
-        push ax
-        ret
-    .errado:
-        jmp $
-
+    mov ah, 0xe         ;printando a resposta (1 unico caracter pq to testando)
+	int 10h
 fim:
     jmp $
 times 510 - ($ - $$) db 0
