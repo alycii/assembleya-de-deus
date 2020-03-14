@@ -100,6 +100,7 @@ desempilhaP:
     jmp lerEnt
 
     .aux:               ;aq eu coloco de volta o troço q ta la
+        mov al, 'w'     ;coloco isso na pilha pq tipo, se tiver parentese abrindo eu tenho q ver isso dps
         push ax
         jmp lerEnt
 achaFim:
@@ -113,15 +114,38 @@ achaFim:
         jmp .loop
 salvaResp:
 
-    mov di, ans
-    add di, bx
-    mov al, 78
-    stosb
+    mov di, ans             ;movo di pro começo da string resposta
+    add di, bx              ;coloco ele na posição q devia tar
 
-    xor bx, bx          
-    add bx, 1           ;NAO SEI PORQUE NAO FUNCIONA SEM ISSO SOCORRO
+    pop ax 
+    cmp al, 1       
+    je .correto             ;se a pilha tiver vazia entao eh pq deu tudo certo
 
-    jmp lerCt
+    .loop:                  ;se ela n tava vazia, ai a gente precisa tirar o lixo
+        pop ax              ;mas ja sabe q ta desbalanceada 
+        cmp al, 1
+        je .errado          ;entao vai pro errado
+        jmp .loop           ;faz o loop ate a pilha ficar vazia
+    
+    .errado:
+        mov al, 78          ;salvo a letra N na respectiva posicao
+        stosb
+
+        xor bx, bx          
+        add bx, 1           ;NAO SEI PORQUE NAO FUNCIONA SEM ISSO SOCORRO
+
+        push 1              ;resetando a pilha
+        jmp lerCt           ;continuando a leitura do prox caso teste
+
+    .correto: 
+        mov al, 83          ;salvo a letra S na respectiva posicao
+        stosb 
+
+        xor bx, bx           ;NAO SEI PORQUE NAO FUNCIONA SEM ISSO SOCORRO
+        add bx, 1
+        
+        push 1              ;resetando a pilha
+        jmp lerCt           ;continuando a leitura do prox caso teste
 printaAns:              ;fiz pra debugar o salvaNao
     mov si, ans
     .loop:
