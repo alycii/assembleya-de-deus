@@ -4,7 +4,6 @@ jmp 0x0000:start
 data:
     ans db "a", 10, 10, 0
     ct db 0
-    qt db 0
 start:
 	mov AX, 0011h ;modo video
     mov bh, 0
@@ -21,16 +20,31 @@ start:
     sub al, '0'         ;subtraio o valor do caractere 0 (?)
     add al, 1
     mov [ct], al        ;vai salvar o numero de casos em ct (?)
-    
-    xor ax, ax
-    mov [qt], al
 
-    mov ah, 0           ;ler e printar o /n
+    mov ah, 0           ;ler o \n ou o 0 do 10
     int 16h
     mov ah, 0xe
-	int 10h
+    int 10h
 
-    mov dh, 0           ;zero o dh
+    cmp al, '0'         ;se foi o 0, agr a gente vai ler o barraN
+    je .barraN
+
+    mov dh, 0           ;zero o dh pra usar na contagem de linha dps
+    jmp lerCt           ;vou ler as entradas
+    
+    .barraN:
+        add al, 11      ;salvo que sao 10 entradas
+        sub al, '0'     ;eu coloco 11 pq eu ja comeco decrementando no loop ai precisa ter 1 a mais
+        mov [ct], al
+
+        mov ah, 0       ;leio o \n
+        int 16h
+        mov ah, 0xe     ;e imprimo
+        int 10h
+
+        mov dh, 0       ;zero o dh p usar na contagem de linha
+        jmp lerCt       ;vou ler as entras
+
 lerCt:                      ;fazer o loop dos casos testes e pular a linha
     .loop:
         mov ah, 02h         ;colocando o cursor na próxima linha
@@ -48,14 +62,12 @@ lerCt:                      ;fazer o loop dos casos testes e pular a linha
 
         jmp lerEnt      ;vou ler a string
 
-        add [qt], ah    ;incrementa a quantidade de entradas lidas
-
         jmp .loop
     .endloop:
         jmp printaAns
 lerEnt:
     .loop:
-        mov ah, 0       ;leio mais um caracter
+        mov ah, 0       ;leio um caracter
         int 16h
         cmp al, 13      ;se foi /n reinicio o loop
         je .endloop
@@ -80,18 +92,20 @@ desempilhaP:
     pop ax
 
     cmp al, 1           ;se o topo da pilha eh 1 entao quer dizer que eu nao tenho 
-    je salvaNao         ;o parentese abrindo portanto está desbalanceado
+    je .aux        ;o parentese abrindo portanto está desbalanceado
 
     cmp al, '('         ;se eu tiver outro caracter
     jne salvaNao        ;também está errado
 
     jmp lerEnt
+    .aux:
+        push 1
+        jmp salvaNao
 salvaNao:               ;a ideia era salvar cada resposta no seu indice
-    mov al, 'N'         ;mas nao ta funfando
-    mov si, ans
-    add si, [qt]
+    mov al, 78         ;mas nao ta funfando
+    mov di, ans
     stosb
-    jmp desempilhaP
+    jmp lerEnt
 printaAns:              ;fiz pra debugar o salvaNao
     mov si, ans
     lodsb
