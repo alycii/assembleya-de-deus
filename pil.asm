@@ -79,6 +79,14 @@ lerEnt:
         je empilhaP
         cmp al, ')'
         je desempilhaP
+        cmp al, '['
+        je empilhaP
+        cmp al, ']'
+        je desempilhaP2
+        cmp al, '{'
+        je empilhaP
+        cmp al, '}'
+        je desempilhaP3
 
         jmp .loop       ;e continuo o loop
     .endloop:
@@ -92,17 +100,64 @@ desempilhaP:
     pop ax
 
     cmp al, 1           ;se o topo da pilha eh 1 entao quer dizer que eu nao tenho 
-    je .aux             ;o parentese abrindo portanto está desbalanceado
+    je .aux1             ;o parentese abrindo portanto está desbalanceado
 
     cmp al, '('         ;se eu tiver outro caracter
     jne .aux            ;também está errado
 
     jmp lerEnt
 
-    .aux:               ;aq eu coloco de volta o troço q ta la
-        mov al, 'w'     ;coloco isso na pilha pq tipo, se tiver parentese abrindo eu tenho q ver isso dps
+    .aux1:
+        push 1          ;e coloco de volta o 1 que nao pode sair de la
+        mov al, 'w'     ;marco que deu errado
         push ax
         jmp lerEnt
+        
+    .aux:
+        mov al, 'w'     ;coloco isso na pilha pq tipo se eu deixar o outro parentese
+        push ax         ;pode ser q apareça o par dele e eu ia pensar q deu certo
+        jmp lerEnt      ;pq a pilha estaria vazia, aí eu coloco uma letra random
+desempilhaP2:
+    pop ax
+
+    cmp al, 1           ;se o topo da pilha eh 1 entao quer dizer que eu nao tenho 
+    je .aux1             ;o parentese abrindo portanto está desbalanceado
+
+    cmp al, '['         ;se eu tiver outro caracter
+    jne .aux            ;também está errado
+
+    jmp lerEnt
+    
+    .aux1:     
+        push 1          ;coloco de volta o 1 que nao pode sair de la
+        mov al, 'w'     ;marco que deu errado
+        push ax 
+        jmp lerEnt
+    .aux:
+        mov al, 'w'     ;coloco isso na pilha pq tipo se eu deixar o outro parentese
+        push ax         ;pode ser q apareça o par dele e eu ia pensar q deu certo
+        jmp lerEnt      ;pq a pilha estaria vazia, aí eu coloco uma letra random
+desempilhaP3:
+    pop ax
+
+    cmp al, 1           ;se o topo da pilha eh 1 entao quer dizer que eu nao tenho 
+    je .aux1             ;o parentese abrindo portanto está desbalanceado
+
+    cmp al, '{'         ;se eu tiver outro caracter
+    jne .aux            ;também está errado
+
+    jmp lerEnt
+
+    .aux1:
+        push 1          ;coloco de volta o 1 que nao pode sair de la
+        mov al, 'w'     ;marco que deu errado
+        push ax 
+        jmp lerEnt
+     
+    .aux:
+        mov al, 'w'     ;coloco isso na pilha pq tipo se eu deixar o outro parentese
+        push ax         ;pode ser q apareça o par dele e eu ia pensar q deu certo
+        jmp lerEnt      ;pq a pilha estaria vazia, aí eu coloco uma letra random
 achaFim:
     mov si, ans 
     xor bx, bx
