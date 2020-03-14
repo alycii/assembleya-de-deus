@@ -2,7 +2,7 @@ org 0x7c00
 jmp 0x0000:start
 
 data:
-    ans db "a", 10, 10, 0
+    ans db "aaaaaaaaaaa", 13, 10, 0
     ct db 0
 start:
 	mov AX, 0011h ;modo video
@@ -84,7 +84,7 @@ lerEnt:
     .endloop:
         mov ah, 0xe
         int 10h
-        jmp lerCt
+        jmp achaFim
 empilhaP:
     push ax             ;coloca o parenteses abrindo na pilha
     jmp lerEnt
@@ -92,32 +92,55 @@ desempilhaP:
     pop ax
 
     cmp al, 1           ;se o topo da pilha eh 1 entao quer dizer que eu nao tenho 
-    je .aux        ;o parentese abrindo portanto está desbalanceado
+    je .aux             ;o parentese abrindo portanto está desbalanceado
 
     cmp al, '('         ;se eu tiver outro caracter
-    jne salvaNao        ;também está errado
+    jne .aux            ;também está errado
 
     jmp lerEnt
-    .aux:
-        push 1
-        jmp salvaNao
-salvaNao:               ;a ideia era salvar cada resposta no seu indice
-    mov al, 78         ;mas nao ta funfando
+
+    .aux:               ;aq eu coloco de volta o troço q ta la
+        push ax
+        jmp lerEnt
+achaFim:
+    mov si, ans 
+    xor bx, bx
+    .loop:
+        lodsb
+        cmp al, 'a'
+        je salvaResp
+        add bx, 1
+        jmp .loop
+salvaResp:
+
     mov di, ans
+    add di, bx
+    mov al, 78
     stosb
-    jmp lerEnt
+
+    xor bx, bx          
+    add bx, 1           ;NAO SEI PORQUE NAO FUNCIONA SEM ISSO SOCORRO
+
+    jmp lerCt
 printaAns:              ;fiz pra debugar o salvaNao
     mov si, ans
-    lodsb
+    .loop:
+        lodsb
+        cmp al, 'a'
+        je .endloop
 
-    mov ah, 02h         ;colocando o cursor na próxima linha
-    mov bh, 0
-    add dh, 1
-    mov dl, 0
-    int 10h
+        mov ah, 02h         ;colocando o cursor na próxima linha
+        mov bh, 0
+        add dh, 1
+        mov dl, 0
+        int 10h
 
-    mov ah, 0xe         ;printando a resposta (1 unico caracter pq to testando)
-	int 10h
+        mov ah, 0xe         ;printando a resposta (1 unico caracter pq to testando)
+        int 10h
+
+        jmp .loop
+    .endloop:
+        jmp fim
 fim:
     jmp $
 times 510 - ($ - $$) db 0
