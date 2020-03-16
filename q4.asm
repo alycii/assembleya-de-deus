@@ -35,9 +35,9 @@ start:
     mov dl, 0
     int 10h
 
-    call printaBase
+    call printaBase         ;printo a parte de cima do retangulo
 
-    call printaParedes
+    call printaParedes      ;printo as paredes
 
     mov ah, 02h             ;passo pra proxima linha
     mov bh, 0
@@ -45,16 +45,16 @@ start:
     mov dl, 0
     int 10h
 
-    call printaBase
+    call printaBase         ;printo a base
 
-    jmp fim 
+    jmp fim                 ;cabou
 printaPergunta:             ;printa a string pedindo a entrada
     .loop:
         lodsb
-        cmp al, 'z'         ;marco o fim da string com z
+        cmp al, 'z'         ;como eu marco o fim da string com z, eu faço essa comparação
         je .endloop
 
-        mov ah, 0xe
+        mov ah, 0xe         ;se nao for z eu printo o caracter
         int 10h
 
         jmp .loop
@@ -63,11 +63,11 @@ printaPergunta:             ;printa a string pedindo a entrada
 leBase:
     mov ah, 0               ;leio o primeiro digito
 	int 16h
-    mov ah, 0xe
+    mov ah, 0xe             ;e printo
 	int 10h
 
     sub al, '0'             ;subtraio o valor do caractere 0
-    mov [ctBase], al        ;vai salvar o tamanho em ctBase
+    mov [ctBase], al        ;salvo o valor em ctBase
 
     mov ah, 0               ;leio o segundo digito ou o \n
 	int 16h
@@ -84,7 +84,7 @@ leBase:
     mov dl, 10               
     mul dl                  ;multiplico ele por 10
 
-    add al, [aux]           ;somo o valor de aux
+    add al, [aux]           ;somo o valor de aux ao valor q foi multiplicado por 10
     mov [ctBase], al        ;e salvo em ctAltura
 
     mov ah, 0               ;agora leio o \n
@@ -93,7 +93,7 @@ leBase:
 	int 10h
 
     .volta:
-        ret
+        ret                 ;volto pra start
 leAltura:
     mov ah, 0               ;leio o primeiro digito
 	int 16h
@@ -101,7 +101,7 @@ leAltura:
 	int 10h
 
     sub al, '0'             ;subtraio o valor do caractere 0
-    mov [ctAltura], al      ;vai salvar o tamanho em ctAltura
+    mov [ctAltura], al      ;salvo o tamanho em ctAltura
 
     mov ah, 0               ;leio o segundo digito ou o \n
 	int 16h
@@ -131,58 +131,59 @@ leAltura:
 printaBase:
     xor bh, bh
     .loop:
-        cmp bh, [ctBase]
-        je .endloop
+        cmp bh, [ctBase]    ;bh eh meu contador, se ele for igual ao tamanho da base
+        je .endloop         ;entao eu ja printei tudo e paro o loop
 
-        mov al, 42
+        mov al, 42          ;se nao eu printo mais um *
         mov ah, 0xe
 	    int 10h
         
-        add bh, 1
+        add bh, 1           ;incremento meu contador
 
         jmp .loop
     .endloop:
-        ret
+        ret                 ;volto p start
 printaParedes:
     xor ah, ah
     mov ah, 1
-    sub [ctAltura], ah 
-    sub [ctAltura], ah
+    sub [ctAltura], ah      ;preciso subtrair 2 da altura
+    sub [ctAltura], ah      ;pq as linhas teto/base já sao parte da altura
+
     .loop:
         xor ah, ah
-        cmp [ctAltura], ah 
+        cmp [ctAltura], ah  ;se ctAltura eh 0 ja printei tudo
         je .endloop
 
-        mov ah, 02h             ;passo pra proxima linha
+        mov ah, 02h         ;passo pra proxima linha
         mov bh, 0
         add dh, 1
         mov dl, 0
         int 10h
 
-        call printaParede 
+        call printaParede   ;printo uma parede tipo:  *           *
 
         xor ah, ah 
         mov ah, 1
-        sub [ctAltura], ah
+        sub [ctAltura], ah  ;decremento ctAltura
         
         jmp .loop
     .endloop:
-        ret
+        ret                 ;volto pra start
 
 printaParede:
     xor bh, bh
     add bh, 1
 
-    mov al, 42
+    mov al, 42              ;printo o *
     mov ah, 0xe
 	int 10h
 
     add bh, 1
-    .loop:
+    .loop:                  ;printo os espaços
         cmp bh, [ctBase]
         je .endloop
 
-        mov al, 32
+        mov al, 32          ;cansei de comentar
         mov ah, 0xe
 	    int 10h
         
@@ -190,10 +191,10 @@ printaParede:
 
         jmp .loop
     .endloop:
-        mov al, 42
+        mov al, 42          ;printo o outro *
         mov ah, 0xe
         int 10h
-        ret
+        ret                 ;e volto pro start
 fim:    
     jmp $
 times 510 - ($ - $$) db 0
